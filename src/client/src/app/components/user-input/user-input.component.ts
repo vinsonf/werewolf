@@ -10,6 +10,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from 'src/app/store';
 import {
   createUser,
+  loginUser,
   updateUser,
 } from 'src/app/store/actions/user/user.actions';
 import { User } from '../../../../../shared/models/user.model';
@@ -33,6 +34,10 @@ export class UserInputComponent implements OnInit, OnChanges {
         '',
         Validators.compose([Validators.required, Validators.minLength(3)]),
       ],
+      password: [
+        '',
+        Validators.compose([Validators.required, Validators.minLength(5)]),
+      ],
     });
   }
 
@@ -55,5 +60,9 @@ export class UserInputComponent implements OnInit, OnChanges {
           updateUser({ data: { ...selectedUser, ...this.addUser.value } })
         );
     this.addUser.reset();
+  }
+
+  login() {
+    this.store.dispatch(loginUser({ data: this.addUser.value }))
   }
 }
