@@ -152,6 +152,14 @@ app.post("/login", function (req, res) {
     });
 });
 
+app.get('logout', function(req, res){
+    res.cookie('jwt', '', {
+        httpOnly: true,
+        maxAge: 0,
+    })
+    res.json({message: 'Successfully Logged Out'})
+})
+
 app.listen(PORT, function () {
   console.log(`starting at localhost http://localhost:${PORT}`);
 });
