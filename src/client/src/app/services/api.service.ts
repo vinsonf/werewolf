@@ -6,7 +6,7 @@ import { Postable } from '../models/postable';
   providedIn: 'root'
 })
 export class ApiService {
-  baseUrl:string = 'http://localhost:3501/';
+  baseUrl:string = 'http://localhost:3000/';
   constructor(private http: HttpClient)
   { }
 

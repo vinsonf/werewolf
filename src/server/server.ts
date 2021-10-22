@@ -6,21 +6,25 @@ import { UserModel } from "./schemas/user.schema.js";
 import mongoose from "mongoose";
 import jwt from 'jsonwebtoken';
 import cookieParser from "cookie-parser";
-
+import * as socketIO from "socket.io";
+import http from 'http';
 import dotenv from "dotenv";
 import { authHandler } from "./middleware/auth.middleware.js";
 dotenv.config();
 const access_secret = process.env.ACCESS_TOKEN_SECRET as string;
 console.log(access_secret);
-
-
+const app = express();
+const server = http.createServer(app);
+const io = new socketIO.Server(server,  { cors: {
+  origin: '*'
+}});
 
 
 
 const saltRounds = 10;
 
-const app = express();
-const PORT = 3501;
+
+const PORT = 3000;
 
 mongoose
   .connect("mongodb://localhost:27017/test")
@@ -32,7 +36,7 @@ mongoose
 app.use(cookieParser())
 app.use(cors({
     credentials: true,
-    origin: ['http://localhost:4200', 'http://localhost:3501', 'http://localhost:8080']
+    origin: ['http://localhost:3000', 'http://localhost:4200', 'http://localhost:3501', 'http://localhost:8080']
 }));
 app.use(express.json());
 
@@ -50,7 +54,7 @@ app.get("/posts", function (req, res) {
 });
 
 app.get("/users", authHandler, function (req: any, res) {
-  UserModel.find({email: req.user.email}, '-password')
+  UserModel.find({}, '-password')
     .then((data) => res.json({ data }))
     .catch((err) => {
       res.status(501);
@@ -158,10 +162,22 @@ app.get('logout', function(req, res){
         maxAge: 0,
     })
     res.json({message: 'Successfully Logged Out'})
+});
+
+app.get('/check-login', authHandler, (req, res) => {
+  res.json({message: 'yes'});
 })
 
-app.listen(PORT, function () {
+server.listen(PORT, function () {
   console.log(`starting at localhost http://localhost:${PORT}`);
 });
 
+
+io.on('connection', function(socket){
+  console.log('a user connected');
+  socket.emit('message', 'work')
+  socket.on('disconnect', function(){
+    console.log('user disconnected');
+  });
+});
 

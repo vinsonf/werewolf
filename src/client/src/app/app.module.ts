@@ -14,13 +14,18 @@ import * as fromUser from './store/reducers/user/user.reducer';
 import { EffectsModule } from '@ngrx/effects';
 import { UserEffects } from './store/effects/user/user.effects';
 import { PageUsersComponent } from './pages/page-users/page-users.component';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+import { PageLoginComponent } from './pages/page-login/page-login.component';
+
+const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
 
 @NgModule({
   declarations: [
     AppComponent,
     UsersListComponent,
     UserInputComponent,
-    PageUsersComponent
+    PageUsersComponent,
+    PageLoginComponent
   ],
   imports: [
     BrowserModule,
@@ -32,6 +37,7 @@ import { PageUsersComponent } from './pages/page-users/page-users.component';
     !environment.production ? StoreDevtoolsModule.instrument() : [],
     StoreModule.forFeature(fromUser.userFeatureKey, fromUser.reducer),
     EffectsModule.forRoot([UserEffects]),
+    SocketIoModule.forRoot(config),
   ],
   providers: [],
   bootstrap: [AppComponent]

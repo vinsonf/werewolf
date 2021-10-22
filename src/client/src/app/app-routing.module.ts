@@ -1,10 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { UsersListComponent } from './components/users-list/users-list.component';
+import { AuthGuard } from './guards/auth.guard';
+import { PageLoginComponent } from './pages/page-login/page-login.component';
 import { PageUsersComponent } from './pages/page-users/page-users.component';
 
 const routes: Routes = [
-  {path: 'users', component: PageUsersComponent}
+  {path: 'login', component: PageLoginComponent},
+  {path: 'users', component: PageUsersComponent, canActivate: [AuthGuard], resolve: []}
 ];
 
 @NgModule({
