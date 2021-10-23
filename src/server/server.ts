@@ -1,33 +1,66 @@
 import express from "express";
-import bcrypt from "bcrypt";
 import cors from "cors";
-import { PostModel } from "./schemas/post.schema.js";
-import { UserModel } from "./schemas/user.schema.js";
 import mongoose from "mongoose";
-import jwt from 'jsonwebtoken';
 import cookieParser from "cookie-parser";
 import * as socketIO from "socket.io";
 import http from 'http';
 import dotenv from "dotenv";
-import { authHandler } from "./middleware/auth.middleware.js";
+
+import {PlayerModel} from "./schemas/player.schema.js";
+import {GameModel} from "./schemas/game.schema.js";
+import {CardModel} from "./schemas/card.schema.js";
+import { setupCardsInitial } from "./helpers/initial.js";
+import { addRandomCards, findNotUsedCards, findPlayerByCardTitle, getGameState, onAddGame, onAddName, onConnection, passOutCards } from "./helpers/io.sim.js";
+
+
+
+
+async function runner() {
+  // setupCardsInitial();
+  // await onConnection('1');
+  // await onAddGame('123');
+  // await onAddName('1', 'test', '123');
+  // await onConnection('2');
+
+  // await onConnection('3');
+  // await onAddName('3', 'test3', '123');
+  // await onAddName('2', 'test2', '123');
+  // await addRandomCards('123');
+  passOutCards('123');
+  const state = await getGameState('123');
+  // const werewolves = await findPlayerByCardTitle('Werewolf');
+  const unusedCards = await findNotUsedCards('123');
+  console.log(JSON.stringify(unusedCards, null, 4));
+  
+  
+
+  // setTimeout(() => {
+  //   mongoose.connection.db.dropDatabase(function(err, result) {
+  //     console.log(err, result); console.log('DB dropped');
+  //   });
+  // } , 20000);
+}
+
+runner();
+
+
+
+
 dotenv.config();
-const access_secret = process.env.ACCESS_TOKEN_SECRET as string;
-console.log(access_secret);
 const app = express();
 const server = http.createServer(app);
+
+
+
+
 const io = new socketIO.Server(server,  { cors: {
   origin: '*'
 }});
 
-
-
-const saltRounds = 10;
-
-
 const PORT = 3000;
 
 mongoose
-  .connect("mongodb://localhost:27017/test")
+  .connect("mongodb://localhost:27017/werewolf")
   .then(() => {
     console.log("Connected to DB Successfully");
   })
@@ -44,129 +77,6 @@ app.get("/", function (req, res) {
   res.json({ message: "test" });
 });
 
-app.get("/posts", function (req, res) {
-  PostModel.find()
-    .then((data) => res.json({ data }))
-    .catch((err) => {
-      res.status(501);
-      res.json({ errors: err });
-    });
-});
-
-app.get("/users", authHandler, function (req: any, res) {
-  UserModel.find({}, '-password')
-    .then((data) => res.json({ data }))
-    .catch((err) => {
-      res.status(501);
-      res.json({ errors: err });
-    });
-});
-app.post("/create-user", function (req, res) {
-  const { name, email, username, password } = req.body;
-
-  bcrypt.genSalt(saltRounds, function (err, salt) {
-    bcrypt.hash(password, salt, function (err, hash) {
-      const user = new UserModel({
-        name,
-        username,
-        email,
-        password: hash,
-      });
-      user
-        .save()
-        .then((data) => {
-          res.json({ data });
-        })
-        .catch((err) => {
-          res.status(501);
-          res.json({ errors: err });
-        });
-    });
-  });
-});
-
-app.post("/create-post", function (req, res) {
-  const { title, body } = req.body;
-  const post = new PostModel({
-    title,
-    body,
-  });
-  post
-    .save()
-    .then((data) => {
-      res.json({ data });
-    })
-    .catch((err) => {
-      res.status(501);
-      res.json({ errors: err });
-    });
-});
-
-app.delete("/delete-user/:id", function (req, res) {
-  const _id = req.params.id;
-  UserModel.findByIdAndDelete(_id).then((data) => {
-    console.log(data);
-    res.json({ data });
-  });
-});
-
-app.put("/update-user/:id", function (req, res) {
-  console.log("Update user");
-  UserModel.findByIdAndUpdate(
-    req.params.id,
-    {
-      $set: { name: req.body.name, email: req.body.email },
-    },
-    {
-      new: true,
-    },
-    function (err, updateUser) {
-      if (err) {
-        res.send("Error updating user");
-      } else {
-        res.json(updateUser);
-      }
-    }
-  );
-});
-
-app.post("/login", function (req, res) {
-  const { email, password } = req.body;
-
-  UserModel.findOne({ email })
-    .then((user) => {
-        console.log(user);
-      
-      bcrypt.compare(password, `${user?.password}`, function (err, result) {
-        if (result) {
-          console.log("It matches!");
-          const accessToken = jwt.sign({user}, access_secret)
-          res.cookie('jwt', accessToken, {
-              httpOnly: true,
-              maxAge: 60 * 1000,
-          })
-          res.json({message: 'Successfully Logged In'})
-        } else {
-          res.sendStatus(403);
-        }
-      });
-    })
-    .catch((err) => {
-      return res.sendStatus(404);
-    });
-});
-
-app.get('logout', function(req, res){
-    res.cookie('jwt', '', {
-        httpOnly: true,
-        maxAge: 0,
-    })
-    res.json({message: 'Successfully Logged Out'})
-});
-
-app.get('/check-login', authHandler, (req, res) => {
-  res.json({message: 'yes'});
-})
 
 server.listen(PORT, function () {
   console.log(`starting at localhost http://localhost:${PORT}`);
