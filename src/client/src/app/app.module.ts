@@ -16,6 +16,8 @@ import { UserEffects } from './store/effects/user/user.effects';
 import { PageUsersComponent } from './pages/page-users/page-users.component';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 import { PageLoginComponent } from './pages/page-login/page-login.component';
+import { PageJoinGameComponent } from './pages/page-join-game/page-join-game.component';
+import { PageCreateGameComponent } from './pages/page-create-game/page-create-game.component';
 
 const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
 
@@ -25,7 +27,9 @@ const config: SocketIoConfig = { url: 'http://localhost:3000', options: {} };
     UsersListComponent,
     UserInputComponent,
     PageUsersComponent,
-    PageLoginComponent
+    PageLoginComponent,
+    PageJoinGameComponent,
+    PageCreateGameComponent
   ],
   imports: [
     BrowserModule,

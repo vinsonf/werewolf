@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from './guards/auth.guard';
-import { PageLoginComponent } from './pages/page-login/page-login.component';
-import { PageUsersComponent } from './pages/page-users/page-users.component';
+import { PageCreateGameComponent } from './pages/page-create-game/page-create-game.component';
+import { PageJoinGameComponent } from './pages/page-join-game/page-join-game.component';
 
 const routes: Routes = [
-  {path: 'login', component: PageLoginComponent},
-  {path: 'users', component: PageUsersComponent, canActivate: [AuthGuard], resolve: []}
+  {path: 'join-game', component: PageJoinGameComponent},
+  {path: 'create-game', component: PageCreateGameComponent},
+  {path: '**', redirectTo: '/join-game'}
 ];
 
 @NgModule({
