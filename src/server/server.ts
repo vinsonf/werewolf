@@ -5,12 +5,18 @@ import cookieParser from "cookie-parser";
 import * as socketIO from "socket.io";
 import http from 'http';
 import dotenv from "dotenv";
+import path from 'path';
+
+
 
 import {PlayerModel} from "./schemas/player.schema.js";
 import {GameModel} from "./schemas/game.schema.js";
 import {CardModel} from "./schemas/card.schema.js";
 import { setupCardsInitial } from "./helpers/initial.js";
 import { addRandomCards, findNotUsedCards, findPlayerByCardTitle, getGameState, onAddGame, onAddName, onConnection, passOutCards } from "./helpers/io.sim.js";
+
+const __dirname = path.resolve();
+
 
 
 
@@ -49,15 +55,15 @@ runner();
 dotenv.config();
 const app = express();
 const server = http.createServer(app);
-
-
+const clientPath = path.join(__dirname, '/dist/client');
+app.use(express.static(clientPath));
 
 
 const io = new socketIO.Server(server,  { cors: {
   origin: '*'
 }});
 
-const PORT = 3000;
+const PORT = 3001;
 
 mongoose
   .connect("mongodb://localhost:27017/werewolf")
@@ -73,8 +79,16 @@ app.use(cors({
 }));
 app.use(express.json());
 
-app.get("/", function (req, res) {
-  res.json({ message: "test" });
+
+
+
+
+
+app.get("/api/test", function (req, res) {
+  res.json({message: "Hello World!"});
+});
+app.get("/api/*", function (req, res) {
+  res.sendStatus(404);
 });
 
 
@@ -91,3 +105,8 @@ io.on('connection', function(socket){
   });
 });
 
+app.get("*", function (req, res) {
+  const filePath = path.join(__dirname, '/dist/client/index.html');
+  console.log(filePath);
+  res.sendFile(filePath);
+});

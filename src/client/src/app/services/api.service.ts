@@ -1,12 +1,13 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
 import { Postable } from '../models/postable';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ApiService {
-  baseUrl:string = 'http://localhost:3000/';
+  baseUrl:string = !environment.production ? 'http://localhost:3000/api/' : '/api/';
   constructor(private http: HttpClient)
   { }
 
