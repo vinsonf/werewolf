@@ -1,0 +1,1 @@
+{"version":3,"file":"card.schema.js","sourceRoot":"","sources":["../../../src/server/schemas/card.schema.ts"],"names":[],"mappings":"AAAA,OAAO,QAAQ,MAAM,UAAU,CAAC;AAChC,MAAM,EAAC,MAAM,EAAE,KAAK,EAAC,GAAG,QAAQ,CAAC;AAEjC,MAAM,UAAU,GAAG,IAAI,MAAM,CAAC;IAC1B,KAAK,EAAE,MAAM;IACb,WAAW,EAAE,MAAM;CACtB,CAAC,CAAC;AAEH,MAAM,CAAC,MAAM,SAAS,GAAG,KAAK,CAAC,MAAM,EAAE,UAAU,CAAC,CAAC"}
