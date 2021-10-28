@@ -7,22 +7,18 @@ import http from 'http';
 import dotenv from "dotenv";
 import path from 'path';
 
-
-
 import {PlayerModel} from "./schemas/player.schema.js";
 import {GameModel} from "./schemas/game.schema.js";
 import {CardModel} from "./schemas/card.schema.js";
 import { setupCardsInitial } from "./helpers/initial.js";
 import { addRandomCards, findNotUsedCards, findPlayerByCardTitle, getGameState, onAddGame, onAddName, onConnection, passOutCards } from "./helpers/io.sim.js";
 
+dotenv.config();
+
 const __dirname = path.resolve();
 
-
-
-
-
 async function runner() {
-  // setupCardsInitial();
+  setupCardsInitial();
   // await onConnection('1');
   // await onAddGame('123');
   // await onAddName('1', 'test', '123');
@@ -32,14 +28,12 @@ async function runner() {
   // await onAddName('3', 'test3', '123');
   // await onAddName('2', 'test2', '123');
   // await addRandomCards('123');
-  passOutCards('123');
-  const state = await getGameState('123');
+  // passOutCards('123');
+  // const state = await getGameState('123');
   // const werewolves = await findPlayerByCardTitle('Werewolf');
-  const unusedCards = await findNotUsedCards('123');
-  console.log(JSON.stringify(unusedCards, null, 4));
+  // const unusedCards = await findNotUsedCards('123');
+  // console.log(JSON.stringify(unusedCards, null, 4));
   
-  
-
   // setTimeout(() => {
   //   mongoose.connection.db.dropDatabase(function(err, result) {
   //     console.log(err, result); console.log('DB dropped');
@@ -49,24 +43,20 @@ async function runner() {
 
 runner();
 
-
-
-
 dotenv.config();
 const app = express();
 const server = http.createServer(app);
 const clientPath = path.join(__dirname, '/dist/client');
 app.use(express.static(clientPath));
 
-
 const io = new socketIO.Server(server,  { cors: {
   origin: '*'
 }});
 
-const PORT = 3001;
+const PORT = 3000;
 
 mongoose
-  .connect("mongodb://localhost:27017/werewolf")
+  .connect(`${process.env.MONGO_URI}`)
   .then(() => {
     console.log("Connected to DB Successfully");
   })
@@ -79,15 +69,10 @@ app.use(cors({
 }));
 app.use(express.json());
 
-
-
-
-
-
 app.get("/api/test", function (req, res) {
   res.json({message: "Hello World!"});
 });
-app.get("/api/*", function (req, res) {
+app.all("/api/*", function (req, res) {
   res.sendStatus(404);
 });
 
@@ -105,7 +90,7 @@ io.on('connection', function(socket){
   });
 });
 
-app.get("*", function (req, res) {
+app.all("*", function (req, res) {
   const filePath = path.join(__dirname, '/dist/client/index.html');
   console.log(filePath);
   res.sendFile(filePath);
