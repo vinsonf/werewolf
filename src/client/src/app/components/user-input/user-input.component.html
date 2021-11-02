@@ -1,9 +1,14 @@
+<div *ngIf="submitted">
+  <p *ngIf="addUser.errors?.doesNotMatch">Passwords Do not Match</p>
+  <p *ngIf="addUser.errors?.noNumber">Password Does Not Contain A Number</p>
+</div>
 <form [formGroup] = 'addUser'>
     <input type="text" formControlName='name' placeholder="name">
     <input type="text" formControlName='email' placeholder="email">
     <input type="text" formControlName='username' placeholder="username">
-    <input type="text" formControlName='password' placeholder="password">
-    <button (click)='postUser(selectedUser)' [disabled]='addUser.invalid'>{{(selectedUser) ? 'Update User' : 'Add User'}}</button>
+    <input  type="text" formControlName='password' placeholder="password">
+    <input type="text" formControlName='confirmPassword' placeholder="confirm password">
+    <button (click)='postUser(selectedUser)' >{{(selectedUser) ? 'Update User' : 'Add User'}}</button>
     <button (click)="login()">Login</button>
 </form>
 

@@ -7,6 +7,7 @@ import {
 } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
+import { confirmPassword, passwordNeedsNumber } from 'src/app/form-validators/confirm-password.validator';
 import { AppState } from 'src/app/store';
 import {
   createUser,
@@ -22,6 +23,7 @@ import { User } from '../../../../../shared/models/user.model';
 })
 export class UserInputComponent implements OnInit, OnChanges {
   addUser: FormGroup;
+  submitted: boolean = false;
   @Input() selectedUser: User | null = null;
   constructor(private fb: FormBuilder, private store: Store<AppState>) {
     this.addUser = this.fb.group({
@@ -38,10 +40,17 @@ export class UserInputComponent implements OnInit, OnChanges {
         '',
         Validators.compose([Validators.required, Validators.minLength(5)]),
       ],
-    });
+      confirmPassword: [
+        '',
+        Validators.compose([Validators.required, Validators.minLength(5)] ),
+      ],
+    }, { validators: [confirmPassword, passwordNeedsNumber] })
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    console.log(this.addUser.contains('names'), this.addUser.value);
+
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes?.selectedUser?.currentValue) {
@@ -54,6 +63,11 @@ export class UserInputComponent implements OnInit, OnChanges {
   }
 
   postUser(selectedUser: User | null) {
+    if (this.addUser.invalid) {
+      this.submitted = true;;
+      return
+    }
+    this.submitted = false;
     !selectedUser
       ? this.store.dispatch(createUser({ data: this.addUser.value }))
       : this.store.dispatch(
